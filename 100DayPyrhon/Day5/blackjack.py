@@ -1,5 +1,6 @@
 # O famoso 21
 import random as rnd
+import returnFoldDraw as rfd
 
 # Fold
 endedPlayer = False
@@ -26,8 +27,6 @@ baralho_bot = []
 botCount = 0
 
 # Da as cartas
-
-
 def draw_card():
     baralho_color = rnd.randrange(0, 2)
     if baralho_color == 0:
@@ -46,8 +45,6 @@ def draw_card():
         return resultValue
 
 # Executa os movimentos
-
-
 def fold_or_draw(choice: str, turn: bool, count : int):
     if turn:
         if(choice.upper() == "SIM" or choice.upper() == "DRAW"):
@@ -64,12 +61,14 @@ def fold_or_draw(choice: str, turn: bool, count : int):
                 print(f" +{int(play)} Player count {count} \n")
 
             print(f"você virou : {play}")
-            return count
+            rfd.count = count
+            return rfd
 
         elif(choice.upper() == "NAO" or choice.upper() == "FOLD"):
-            endedPlayer = True
+            rfd.count = count
+            rfd.endedPlayer = True
             print(f"Você arregou com o baralho: {baralho_jogador} e com o total de: {count}")
-            return count
+            return rfd
         else:
             print("Num entendi")
             return fold_or_draw(input("SIM OU NAO? "), turn, count)
@@ -83,36 +82,73 @@ def fold_or_draw(choice: str, turn: bool, count : int):
                 count += int(botPlay)
 
             print(f"O RoboCopinson virou: {botPlay}")
-            return count
+            rfd.count = count
+            return rfd
 
         else:
-            endedBot = True
+            rfd.count = count
+            rfd.endedBot = True
             print(f"O bot arregou com as seguintes cartas: {baralho_bot} totalizando {count}")
-            return count
+            return rfd
 
-
+#Valida vitória
+def endGame():
+    if (playerCount == 21 and botCount == 21):
+        print("EMPATOU, EU NÃO ACREDITO")
+    
+    elif playerCount == botCount:
+         print("EMPATOU, EU NÃO ACREDITO")
+        
+    elif playerCount == 21:
+        print("O player ganhou, inacreditavel")
+        
+    elif botCount == 21:
+        print("Deu a lógica RoboCopinson jogou o que sabe")
+        
+    elif playerCount > botCount and playerCount <=21:
+        print("O player ganhou, inacreditavel")
+        
+    elif botCount > playerCount and botCount <=21:
+        print("Deu a lógica RoboCopinson jogou o que sabe")
+        
+def checkStatusGame(endedBot : bool, endedPlayer : bool):
+    if endedBot == True and endedPlayer == True:
+        return False
+    else:
+        return True
+    
+        
 print("O famoso 21, você vai jogar contra o RoboCopinson nossa maquina invencivel")
 opt = input("Preparado? ")
 
 
 # Loop jogo
-playerTurn = False
-playerCount += fold_or_draw(opt, True, playerCount)
+playerTurn = True
+botObj = rfd
+botObj.endedBot = False
+botObj.count = 0
+playerObj = rfd
+playerObj.endedPlayer = False
+playerObj.count = 0
 
-while not endedPlayer and not endedBot:
+while checkStatusGame(botObj.endedBot, playerObj.endedPlayer):
     if endedBot:
             if playerTurn:
                 opt = input("Continua ou não? ")
-                playerCount += fold_or_draw(opt, playerTurn, playerCount)
-    
+                             
     if endedPlayer:
-            botCount += fold_or_draw(opt, playerTurn, botCount)
+            botObj = fold_or_draw(opt, playerTurn, botObj.count)
         
     else:
         if playerTurn:
-            opt = input("Continua ou não? ")
-            playerCount += fold_or_draw(opt, playerTurn, playerCount)
+            opt = input("Vai ou arrega? ")
+            playerObj = fold_or_draw(opt, playerTurn, playerObj.count)
             playerTurn = False
+
         else:
-            botCount += fold_or_draw(opt, playerTurn, botCount)
+            botObj = fold_or_draw(opt, playerTurn, botObj.count)
             playerTurn = True
+            if opt.upper() != "SIM":
+                playerTurn = False
+
+endGame()
