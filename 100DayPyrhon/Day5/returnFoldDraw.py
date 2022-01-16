@@ -1,3 +1,5 @@
 endedPlayer : bool
+playerCount : int
 endedBot : bool
-count : int
+botCount : int
+playerTurn : bool
